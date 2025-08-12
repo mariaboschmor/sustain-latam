@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Tipografía y color base */
+html, body {
+  background-color: #0B0D10;
+  color: #ffffff;
+}
