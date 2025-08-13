@@ -11,8 +11,8 @@
     "next": "latest",
     "react": "latest",
     "react-dom": "latest",
-    "tailwindcss": "latest",
-    "@tailwindcss/postcss": "latest",
+       "tailwindcss": "latest",
+    "autoprefixer": "latest",
     "postcss": "latest"
   },
   "devDependencies": {}
