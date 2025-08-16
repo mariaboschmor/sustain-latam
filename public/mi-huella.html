@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mi huella — Hub Sustentabilidad</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <script src="https://kit.fontawesome.com/a2e0e6ad3b.js" crossorigin="anonymous"></script>
+  <style>
+    :root{
+      --bg:#0c1020; --card:#0b1222; --muted:#94a3b8; --light:#e8f6ee;
+      --primary:#5de08a; --secondary:#22d3ee; --accent:#86efac; --danger:#ef4444;
+      --ring: rgba(93,224,138,.25);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto;
+      background:radial-gradient(1200px 800px at 80% -10%,rgba(45,212,191,.2),transparent),linear-gradient(180deg,#0b1222,#0c1020);
+      color:#e2e8f0}
+    a{color:var(--accent);text-decoration:none} a:hover{text-decoration:underline}
+    .container{max-width:1100px;margin:0 auto;padding:20px}
+    header{position:sticky;top:0;z-index:20;background:rgba(11,18,34,.75);backdrop-filter: blur(10px);
+      border-bottom:1px solid rgba(255,255,255,.08)}
+    nav a{margin:0 10px;color:#cbd5e1} nav a:hover{color:#fff}
+    .spacer{flex:1}
+    .row{display:flex;align-items:center;gap:14px}
+    .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:12px;
+      border:1px solid rgba(255,255,255,.12);background:#0f172a;color:#e2e8f0;cursor:pointer}
+    .btn.primary{background:linear-gradient(90deg,#22c55e,#10b981); color:#072e16; font-weight:700;border:none}
+    .btn.ghost{background:transparent}
+    .btn:focus{outline:3px solid var(--ring)}
+    .pill{display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(255,255,255,.12);
+      border-radius:999px;padding:6px 10px;font-size:12px;color:#a7f3d0;background:rgba(5,46,34,.5)}
+    h1,h2,h3{margin:0 0 10px}
+    h1{font-size:28px} h2{font-size:22px}
+    section{padding:20px;margin:16px 0;border:1px solid rgba(255,255,255,.06);border-radius:16px;background:rgba(11,18,34,.55)}
+    .grid{display:grid;gap:16px}
+    @media(min-width:900px){.grid.cols-2{grid-template-columns:repeat(2,1fr)}.grid.cols-3{grid-template-columns:repeat(3,1fr)}}
+    .card{padding:16px;border:1px solid rgba(255,255,255,.08);border-radius:14px;background:rgba(255,255,255,.03)}
+    label{display:block;margin:8px 0 6px;color:#cbd5e1;font-size:14px}
+    input,select,button{font:inherit}
+    input,select{width:100%;padding:10px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:#0f172a;color:#e2e8f0}
+    table{width:100%;border-collapse:collapse} th,td{padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.06);text-align:left}
+    .muted{color:var(--muted);font-size:14px}
+    .mini{font-size:12px}
+    .avatar{width:88px;height:88px;border-radius:50%;object-fit:cover;border:3px solid var(--primary);background:#07331b}
+    .tabs{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0 12px}
+    .tab{padding:8px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.1);cursor:pointer}
+    .tab.active{background:rgba(255,255,255,.08)}
+    /* toast */
+    .toast{position:fixed;right:16px;bottom:16px;background:#0b4130;border:1px solid #134e31;color:#d1fae5;padding:12px 14px;border-radius:12px;display:none}
+    canvas{max-width:100%}
+  </style>
+</head>
+<body>
+  <!-- Simple header to blend into existing site -->
+  <header>
+    <div class="container row">
+      <div class="row" style="gap:10px">
+        <img id="hdrAvatar" class="avatar" alt="avatar" src="" />
+        <div>
+          <div style="font-weight:800">Mi huella</div>
+          <div id="hdrWelcome" class="muted mini">Bienvenida</div>
+        </div>
+      </div>
+      <div class="spacer"></div>
+      <nav aria-label="Volver / Navegación">
+        <a href="/">Inicio</a>
+        <a href="/#videos">Videos</a>
+        <a href="/#articles">Artículos</a>
+        <a href="/#glossary">Glosario</a>
+      </nav>
+      <button id="openAuth" class="btn primary"><i class="fa-solid fa-user"></i> Entrar</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <section>
+      <div class="row" style="justify-content:space-between;align-items:center">
+        <div>
+          <h1 id="welcome">Bienvenida</h1>
+          <p class="muted">Tu espacio para medir, mejorar y compartir tu impacto. Diseñado para Gen Z: rápido, claro y con un toque de juego ✨</p>
+        </div>
+        <span class="pill"><i class="fa-solid fa-seedling"></i> Beta local (sin backend)</span>
+      </div>
+    </section>
+
+    <!-- Perfil & Avatar -->
+    <section>
+      <div class="grid cols-3">
+        <div class="card">
+          <h3>Tu perfil</h3>
+          <form id="profileForm">
+            <label>Nombre</label><input id="name" required>
+            <label>Correo</label><input id="email" type="email" required>
+            <label>@Usuario (a-z, 0-9, _)</label><input id="username" placeholder="ej. eco_maria" required>
+            <button class="btn" type="submit">Guardar</button>
+          </form>
+          <small class="muted">Tu @usuario sirve para agregar amigos y competir.</small>
+        </div>
+        <div class="card">
+          <h3>Avatar verde (IA local)</h3>
+          <div class="row">
+            <img id="avatarPreview" class="avatar" alt="avatar">
+            <div class="mini muted">Sube tu foto y la convertimos en una versión “verdecita”.</div>
+          </div>
+          <input id="avatarFile" type="file" accept="image/*" style="margin-top:8px">
+          <div class="row" style="margin-top:8px">
+            <button id="genAvatarBtn" class="btn">Generar avatar verde</button>
+            <button id="downloadAvatarBtn" class="btn">Descargar PNG</button>
+          </div>
+          <canvas id="avatarCanvas" width="512" height="512" style="display:none"></canvas>
+        </div>
+        <div class="card">
+          <h3>Privacidad</h3>
+          <label class="row" style="gap:8px;align-items:center">
+            <input id="shareEmissions" type="checkbox"> Permitir que mis amigos vean mi total del mes
+          </label>
+          <div class="mini muted">Solo para el ranking y competencias.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Resumen + Chart + Biblioteca -->
+    <section>
+      <div class="tabs" role="tablist">
+        <div class="tab active" data-tab="resumen" role="tab" tabindex="0">Resumen</div>
+        <div class="tab" data-tab="amigos" role="tab" tabindex="0">Amigos</div>
+        <div class="tab" data-tab="reto" role="tab" tabindex="0">Reto</div>
+        <div class="tab" data-tab="guardados" role="tab" tabindex="0">Biblioteca</div>
+      </div>
+
+      <div id="pane-resumen">
+        <div class="grid cols-3">
+          <div class="card">
+            <h3>Emisiones del mes</h3>
+            <div style="font-size:28px;font-weight:800" id="mTotal">0 kgCO₂e</div>
+            <div class="muted" id="mMonth">—</div>
+          </div>
+          <div class="card">
+            <h3>Principales fuentes</h3>
+            <ul id="mBreakdown" class="muted" style="padding-left:18px;margin:0"></ul>
+          </div>
+          <div class="card">
+            <h3>Gráfica CO₂e</h3>
+            <canvas id="breakdownChart" width="360" height="200" aria-label="Gráfica de emisiones por categoría"></canvas>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:16px">
+          <h3>Agregar a este mes (demo)</h3>
+          <form id="addEmisForm" class="grid cols-3">
+            <div>
+              <label>Categoría</label>
+              <select id="cat">
+                <option>Transporte</option><option>Energía</option><option>Alimentos</option><option>Compras</option>
+              </select>
+            </div>
+            <div>
+              <label>kgCO₂e</label><input id="kg" type="number" min="0" step="0.01" value="0.5">
+            </div>
+            <div style="display:flex;align-items:flex-end"><button class="btn primary" type="submit">Sumar</button></div>
+          </form>
+          <small class="muted">MVP local: guarda en tu navegador.</small>
+        </div>
+      </div>
+
+      <div id="pane-amigos" style="display:none">
+        <div class="card">
+          <h3>Buscar y agregar por @usuario</h3>
+          <form id="searchUserForm" class="grid cols-2">
+            <div>
+              <label>@usuario</label>
+              <input id="searchUser" placeholder="ej. @eco_juan">
+            </div>
+            <div style="display:flex;align-items:flex-end;gap:8px">
+              <button class="btn" type="submit"><i class="fa-solid fa-user-plus"></i> Agregar</button>
+              <button class="btn ghost" id="clearSearch" type="button">Limpiar</button>
+            </div>
+          </form>
+          <div id="searchResult" class="muted" style="margin-top:8px"></div>
+        </div>
+
+        <div class="grid cols-2">
+          <div class="card">
+            <h3>Tu link de recomendación</h3>
+            <div class="row" style="gap:8px;flex-wrap:wrap">
+              <input id="refLink" type="text" readonly style="min-width:320px">
+              <button id="copyRef" class="btn">Copiar</button>
+            </div>
+            <small class="muted">Quien llegue con tu link y se suscriba, se atribuye a tu ref (cuando conectemos backend).</small>
+          </div>
+          <div class="card">
+            <h3>Leaderboard (reducción vs. base)</h3>
+            <table>
+              <thead><tr><th>#</th><th>Participante</th><th>Reducción</th></tr></thead>
+              <tbody id="lbTable"><tr><td colspan="3" class="muted">Aún sin datos.</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Amigos</h3>
+          <table>
+            <thead><tr><th>Amigo</th><th>@Usuario</th><th>Comparte</th><th>Mes actual</th><th></th></tr></thead>
+            <tbody id="friendsTable"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="pane-reto" style="display:none">
+        <div class="grid cols-2">
+          <div class="card">
+            <h3>Crear reto</h3>
+            <form id="challengeForm" class="grid">
+              <div><label>Nombre del reto</label><input id="chName" placeholder="Mi reto anual"></div>
+              <div><label>Duración (días)</label>
+                <select id="chDays"><option>30</option><option selected>90</option><option>180</option><option>365</option></select>
+              </div>
+              <div><label>Meta de reducción (%)</label><input id="chTarget" type="number" min="1" max="90" value="20"></div>
+              <div><button class="btn primary" type="submit">Iniciar reto</button></div>
+            </form>
+            <small class="muted">Usamos tu total del mes como línea base; el progreso se calcula por % de reducción.</small>
+          </div>
+          <div class="card">
+            <h3>Progreso del reto</h3>
+            <table>
+              <thead><tr><th>#</th><th>Participante</th><th>Reducción</th><th>Estado</th></tr></thead>
+              <tbody id="lbTable2"><tr><td colspan="4" class="muted">Aún no hay reto.</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div id="pane-guardados" style="display:none">
+        <div class="grid cols-2">
+          <div class="card">
+            <h3>Videos favoritos</h3>
+            <ul id="favVideos" class="muted"><li>—</li></ul>
+          </div>
+          <div class="card">
+            <h3>Artículos guardados</h3>
+            <ul id="savedArticles" class="muted"><li>—</li></ul>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Toast -->
+  <div id="toast" class="toast">Copiado al portapapeles</div>
+
+  <!-- Modal Auth (login/registro simple local) -->
+  <div id="authModal" style="position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;padding:16px">
+    <div style="max-width:480px;width:100%;background:#0b1222;border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:16px">
+      <div class="row right"><button id="closeAuth" class="btn ghost">✕</button></div>
+      <h3>Tu cuenta</h3>
+      <div class="tabs">
+        <div class="tab active" data-auth="login">Iniciar sesión</div>
+        <div class="tab" data-auth="signup">Crear cuenta</div>
+      </div>
+      <div id="pane-login">
+        <form id="loginForm">
+          <label>Correo</label><input id="loginEmail" type="email" required autocomplete="email">
+          <label>Contraseña</label><input id="loginPwd" type="password" required autocomplete="current-password">
+          <button class="btn primary" type="submit">Entrar</button>
+        </form>
+      </div>
+      <div id="pane-signup" style="display:none">
+        <form id="signupForm">
+          <label>Nombre</label><input id="suName" required>
+          <label>Correo</label><input id="suEmail" type="email" required>
+          <label>Contraseña</label><input id="suPwd" type="password" required>
+          <button class="btn primary" type="submit">Crear cuenta</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ===== Helpers =====
+    const $ = s => document.querySelector(s);
+    const $$ = s => Array.from(document.querySelectorAll(s));
+    const toast = (msg) => { const t=$('#toast'); t.textContent=msg; t.style.display='block'; setTimeout(()=>t.style.display='none',1200); };
+    const ym = new Date().toISOString().slice(0,7);
+
+    const load = (k,fb)=>{ try{return JSON.parse(localStorage.getItem(k)||JSON.stringify(fb));}catch{return fb;} }
+    const save = (k,v)=> localStorage.setItem(k, JSON.stringify(v));
+
+    const user = ()=> load('user', {});
+    const setUser = u => { save('user', u); paintHeader(); };
+
+    // ===== Header & Auth =====
+    const paintHeader = ()=>{
+      const u = user();
+      $('#welcome').textContent = u.name ? `Bienvenida, ${u.name}` : 'Bienvenida';
+      $('#hdrWelcome').textContent = u.name ? `Hola, ${u.name}` : 'Bienvenida';
+      $('#hdrAvatar').src = u.avatarDataUrl || '';
+    };
+
+    const openAuth = ()=> $('#authModal').style.display='flex';
+    const closeAuth = ()=> $('#authModal').style.display='none';
+    $('#openAuth').onclick=openAuth; $('#closeAuth').onclick=closeAuth;
+
+    $$('.tab[data-auth]').forEach(t=> t.addEventListener('click', ()=>{
+      $$('.tab[data-auth]').forEach(z=>z.classList.remove('active'));
+      t.classList.add('active');
+      const mode = t.dataset.auth;
+      $('#pane-login').style.display = mode==='login' ? 'block' : 'none';
+      $('#pane-signup').style.display = mode==='signup' ? 'block' : 'none';
+    }));
+
+    $('#signupForm')?.addEventListener('submit', e=>{
+      e.preventDefault();
+      const u = user();
+      u.name = $('#suName').value.trim();
+      u.email = $('#suEmail').value.trim().toLowerCase();
+      u.pwd = $('#suPwd').value; // DEMO
+      setUser(u);
+      closeAuth(); paintHeader();
+    });
+    $('#loginForm')?.addEventListener('submit', e=>{
+      e.preventDefault();
+      const u = user();
+      if (u.email === $('#loginEmail').value.trim().toLowerCase() && u.pwd === $('#loginPwd').value){
+        closeAuth(); paintHeader();
+      } else alert('Credenciales inválidas (demo local).');
+    });
+
+    // ===== Perfil =====
+    function validateHandle(h){ return /^[a-z0-9_]{3,20}$/.test(h); }
+
+    $('#profileForm').addEventListener('submit', e=>{
+      e.preventDefault();
+      const u=user();
+      const name = $('#name').value.trim();
+      const email = $('#email').value.trim().toLowerCase();
+      const username = $('#username').value.replace(/^@/,'').trim().toLowerCase();
+      if(!validateHandle(username)){ alert('El @usuario debe tener 3-20 caracteres (a-z, 0-9, _).'); return; }
+      u.name=name; u.email=email; u.username=username;
+      save('user', u); paintHeader(); syncToDirectory();
+      toast('Perfil guardado');
+    });
+
+    // ===== Avatar verde (Canvas overlay) =====
+    async function toGreenAvatar(file){
+      return new Promise((res,rej)=>{
+        const fr=new FileReader();
+        fr.onload=()=>{ const img=new Image(); img.onload=()=>{
+          const c=$('#avatarCanvas'), ctx=c.getContext('2d'), size=c.width;
+          const s=Math.min(img.width,img.height), sx=(img.width-s)/2, sy=(img.height-s)/2;
+          ctx.clearRect(0,0,size,size); ctx.save(); ctx.beginPath(); ctx.arc(size/2,size/2,size/2,0,Math.PI*2); ctx.clip();
+          ctx.drawImage(img,sx,sy,s,s,0,0,size,size);
+          ctx.globalCompositeOperation='overlay'; ctx.fillStyle='rgba(50,160,90,.35)'; ctx.fillRect(0,0,size,size);
+          ctx.globalCompositeOperation='soft-light'; ctx.fillStyle='rgba(180,255,200,.25)'; ctx.fillRect(0,0,size,size);
+          ctx.restore(); ctx.lineWidth=10; ctx.strokeStyle='#4caf50'; ctx.beginPath(); ctx.arc(size/2,size/2,size/2-5,0,Math.PI*2); ctx.stroke();
+          res(c.toDataURL('image/png'));
+        }; img.onerror=()=>rej(new Error('Imagen inválida')); img.src=fr.result; }; fr.onerror=()=>rej(new Error('No se pudo leer la imagen')); fr.readAsDataURL(file);
+      });
+    }
+    $('#avatarFile').addEventListener('change', ()=>{
+      const f=$('#avatarFile').files[0]; if(!f) return;
+      const fr=new FileReader(); fr.onload=()=> $('#avatarPreview').src=fr.result; fr.readAsDataURL(f);
+    });
+    $('#genAvatarBtn').onclick = async ()=>{
+      const f=$('#avatarFile').files[0]; if(!f){alert('Sube una foto primero.');return;}
+      try{ const url=await toGreenAvatar(f); const u=user(); u.avatarDataUrl=url; save('user',u); $('#avatarPreview').src=url; paintHeader(); toast('Avatar actualizado'); }catch(e){alert('No se pudo generar el avatar.');}
+    };
+    $('#downloadAvatarBtn').onclick = ()=>{
+      const src=$('#avatarPreview').src; if(!src){alert('No hay avatar.');return;} const a=document.createElement('a'); a.href=src; a.download='avatar_verde.png'; a.click();
+    };
+
+    // ===== Emisiones & Chart =====
+    const emissions = ()=> load('emissions', { byMonth:{}, breakdown:{} });
+    const setEmissions = e => save('emissions', e);
+    function addEmission(cat, kg){
+      const e=emissions();
+      e.byMonth[ym] = (e.byMonth[ym]||0) + kg;
+      e.breakdown[ym] = e.breakdown[ym] || {};
+      e.breakdown[ym][cat] = (e.breakdown[ym][cat]||0) + kg;
+      setEmissions(e); paintSummary();
+    }
+    function paintSummary(){
+      const e=emissions(); const total=e.byMonth[ym]||0;
+      $('#mTotal').textContent = `${total.toFixed(2)} kgCO₂e`;
+      $('#mMonth').textContent = ym;
+      const bd = e.breakdown[ym] || {Transporte: total*0.5, Energía: total*0.3, Alimentos: total*0.2};
+      $('#mBreakdown').innerHTML = Object.entries(bd).map(([k,v])=>`<li>${k}: ${v.toFixed(1)} kgCO₂e</li>`).join('');
+      drawBar('breakdownChart', bd);
+      syncToDirectory();
+    }
+    function drawBar(id, data){
+      const c=$('#'+id); if(!c) return; const ctx=c.getContext('2d');
+      ctx.clearRect(0,0,c.width,c.height);
+      const ent=Object.entries(data), vals=ent.map(e=>e[1]), labels=ent.map(e=>e[0]);
+      const max=Math.max(1,...vals); const pad=30, gap=16; const w=(c.width-pad*2-gap*(vals.length-1))/vals.length;
+      vals.forEach((v,i)=>{
+        const h=(c.height-pad*2)*(v/max), x=pad+i*(w+gap), y=c.height-pad-h;
+        ctx.fillStyle = i%2 ? '#10b981' : '#22c55e'; ctx.fillRect(x,y,w,h);
+        ctx.fillStyle = '#cbd5e1'; ctx.font='12px Inter, sans-serif'; ctx.fillText(labels[i], x, c.height-pad+14); ctx.fillText(v.toFixed(0), x, y-4);
+      });
+    }
+    $('#addEmisForm').addEventListener('submit', e=>{
+      e.preventDefault();
+      addEmission($('#cat').value, parseFloat($('#kg').value||'0'));
+      toast('Añadido');
+    });
+
+    // ===== Directorio & Amigos =====
+    const directory = ()=> load('directoryUsers', []);
+    const setDirectory = a => save('directoryUsers', a);
+    const friends = ()=> load('friends', []);
+    const setFriends = a => save('friends', a);
+
+    function syncToDirectory(){
+      const u=user(); if(!u.username) return;
+      const e=emissions(); const total=e.byMonth[ym]||0;
+      const arr=directory(); const i=arr.findIndex(x=> (x.username||'').toLowerCase()===(u.username||'').toLowerCase());
+      const entry={ username:u.username, name:u.name||u.username, shareEmissions: !!u.shareEmissions, emissions:{[ym]:total} };
+      if(i>=0) arr[i]={...arr[i],...entry}; else arr.push(entry);
+      setDirectory(arr); paintFriends();
+    }
+    function findByHandle(handle){
+      const h=(handle||'').replace(/^@/,'').toLowerCase();
+      return directory().find(x => (x.username||'').toLowerCase()===h) || null;
+    }
+    function paintFriends(){
+      const arr=friends();
+      $('#friendsTable').innerHTML = arr.map((f,i)=>{
+        const share=f.share?'Sí':'No';
+        const v = typeof f.emissions?.[ym]==='number' ? `${f.emissions[ym].toFixed(1)} kg` : '—';
+        return `<tr><td>${f.name}</td><td>${f.username?'@'+f.username:'—'}</td><td>${share}</td><td>${v}</td>
+                <td><button class="btn mini" data-idx="${i}">X</button></td></tr>`;
+      }).join('') || `<tr><td colspan="5" class="muted">Sin amigos aún.</td></tr>`;
+      $$('#friendsTable button[data-idx]').forEach(b=> b.onclick=()=>{ const arr=friends(); arr.splice(parseInt(b.dataset.idx,10),1); setFriends(arr); paintFriends(); paintLeaderboards(); });
+      paintLeaderboards();
+    }
+
+    $('#searchUserForm').addEventListener('submit', e=>{
+      e.preventDefault();
+      const q=$('#searchUser').value.trim(); if(!q) return;
+      const found = findByHandle(q);
+      if(!found){ $('#searchResult').textContent='No encontrado en el directorio local.'; return; }
+      const arr=friends();
+      if(arr.some(f => (f.username||'').toLowerCase()===found.username.toLowerCase())){ $('#searchResult').textContent='Ya es tu amigo.'; return; }
+      const f={ name:found.name||found.username, username:found.username, share:!!found.shareEmissions, emissions:found.emissions||{} };
+      arr.push(f); setFriends(arr); paintFriends(); $('#searchResult').textContent=`Añadido: ${f.name} (@${f.username}).`;
+    });
+    $('#clearSearch').onclick=()=>{ $('#searchUser').value=''; $('#searchResult').textContent=''; };
+
+    // ===== Reto & Leaderboards =====
+    const challenge = ()=> load('challenge', null);
+    const setChallenge = c => save('challenge', c);
+
+    function paintLeaderboards(){
+      const ch=challenge();
+      // Pane amigos (lbTable)
+      const e=emissions(); const baseMe = ch?.baseline?.me || (e.byMonth[ym]||0);
+      const rows=[]; rows.push({who:user().name||'Tú', red: baseMe? (baseMe - (e.byMonth[ym]||0))/baseMe : 0});
+      friends().forEach((f,i)=>{
+        const b = ch?.baseline?.['f'+i] ?? f.emissions?.[ym] ?? 0;
+        const now = f.emissions?.[ym];
+        const red = (typeof now==='number' && b) ? (b-now)/b : 0;
+        rows.push({who:f.name, red});
+      });
+      rows.sort((a,b)=>(b.red||0)-(a.red||0));
+      $('#lbTable').innerHTML = rows.map((r,i)=> `<tr><td>${i+1}</td><td>${r.who}</td><td>${(Math.max(0,Math.min(1,r.red))*100).toFixed(1)}%</td></tr>`).join('') || `<tr><td colspan="3" class="muted">Sin datos.</td></tr>`;
+
+      // Pane reto (lbTable2)
+      if(!ch){ $('#lbTable2').innerHTML='<tr><td colspan="4" class="muted">Aún no hay reto.</td></tr>'; return; }
+      const target = ch.targetPct||20;
+      const rows2=[...rows];
+      $('#lbTable2').innerHTML = rows2.map((r,i)=>{
+        const pct = Math.max(0,Math.min(1,r.red))*100;
+        const state = pct>=target ? 'Meta alcanzada' : 'En curso';
+        return `<tr><td>${i+1}</td><td>${r.who}</td><td>${pct.toFixed(1)}%</td><td>${state}</td></tr>`;
+      }).join('');
+    }
+
+    $('#challengeForm').addEventListener('submit', e=>{
+      e.preventDefault();
+      const name=$('#chName').value.trim()||'Reto';
+      const days=parseInt($('#chDays').value,10);
+      const target=parseFloat($('#chTarget').value||'20');
+      // baseline
+      const e=emissions(); const base={me: (e.byMonth[ym]||0)};
+      friends().forEach((f,i)=> base['f'+i]= f.emissions?.[ym] || 0);
+      setChallenge({name, days, started:new Date().toISOString().slice(0,10), targetPct:target, baseline:base});
+      toast('Reto iniciado'); paintLeaderboards();
+    });
+
+    // ===== Guardados (demo) =====
+    const favVideos = ()=> load('favVideos', []);
+    const savedArticles = ()=> load('savedArticles', []);
+    function paintLibrary(){
+      $('#favVideos').innerHTML = favVideos().map(v=> `<li>${v}</li>`).join('') || '<li>—</li>';
+      $('#savedArticles').innerHTML = savedArticles().map(a=> `<li>${a}</li>`).join('') || '<li>—</li>';
+    }
+
+    // ===== Ref link =====
+    function initRef(){
+      const u=user(); const id = u.id || (u.id='U'+Math.random().toString(36).slice(2,8)); save('user',u);
+      const base = location.origin + '/mi-huella.html';
+      const link = `${base}?ref=${encodeURIComponent(id)}#newsletter`;
+      const input = $('#refLink'); input.value=link;
+      $('#copyRef').onclick = ()=>{ input.select(); document.execCommand('copy'); toast('Link copiado'); };
+    }
+
+    // ===== Tabs =====
+    function selectTab(name){
+      $$('.tab[data-tab]').forEach(t=> t.classList.toggle('active', t.dataset.tab===name));
+      $('#pane-resumen').style.display = name==='resumen'?'block':'none';
+      $('#pane-amigos').style.display = name==='amigos'?'block':'none';
+      $('#pane-reto').style.display = name==='reto'?'block':'none';
+      $('#pane-guardados').style.display = name==='guardados'?'block':'none';
+      if(name==='resumen') paintSummary();
+      if(name==='amigos') { paintFriends(); initRef(); }
+      if(name==='reto') paintLeaderboards();
+      if(name==='guardados') paintLibrary();
+    }
+    $$('.tab[data-tab]').forEach(t=>{
+      t.addEventListener('click', ()=> selectTab(t.dataset.tab));
+      t.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); selectTab(t.dataset.tab); } });
+    });
+
+    // ===== Share toggle =====
+    $('#shareEmissions').addEventListener('change', e=>{
+      const u=user(); u.shareEmissions = e.target.checked; save('user',u); syncToDirectory();
+    });
+
+    // ===== Init =====
+    (function init(){
+      const u=user();
+      $('#name').value=u.name||''; $('#email').value=u.email||''; $('#username').value=u.username||'';
+      $('#avatarPreview').src=u.avatarDataUrl||''; $('#shareEmissions').checked=!!u.shareEmissions;
+      paintHeader(); selectTab('resumen');
+    })();
+  </script>
+</body>
+</html>
